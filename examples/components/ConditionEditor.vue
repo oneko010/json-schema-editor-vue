@@ -34,25 +34,34 @@ export default {
             get: function() {
                 const node = this.pickValue
                 node.allOf || this.$set(node, 'allOf', [])
-                
-                if (this.index >= 0 && this.value) {
-                    const ifnode = node.allOf[this.index].if
-                    ifnode.type || this.$set(ifnode, "type", "object")
-                    const conditionNode = {}
-                    this.$set(conditionNode, "if", ifnode)
-                    return conditionNode
-                } else {
-                    return {
-                        "root": {
-                            "type": "object",
+
+                let index = this.index
+                if (index < 0) {
+                    const conditionObject = {
+                        "if": {
                             "properties": {
-                                "acode": {
-                                    "type": "string"
+                                "bbb": {
+                                    "const": "67"
                                 }
                             }
+                        }, 
+                        "then": {
+                            "required": [
+                                "a"
+                            ]
                         }
                     }
+                    index = node.allOf.length
+                    console.log(node.allOf.length)
+                    node.allOf[index] = conditionObject
+                    console.log(node)
                 }
+                const ifnode = node.allOf[index].if
+                ifnode.type || this.$set(ifnode, "type", "object")
+                const conditionNode = {}
+                this.$set(conditionNode, "if", ifnode)
+
+                return conditionNode
             }
         }
     }
@@ -62,7 +71,7 @@ export default {
 <template>
     <div>
         <p>{{ condition }}</p>
-    <json-schema-editor class="schema" :value="condition" disabledType lang="zh_CN" custom/>
+        <json-schema-editor class="schema" :value="condition" disabledType lang="zh_CN" custom/>
     </div>
 </template>
 

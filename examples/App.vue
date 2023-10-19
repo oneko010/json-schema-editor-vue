@@ -15,7 +15,7 @@
         <json-schema-editor class="schema" :value="tree" :hasCondition="conditions.length > 0" disabledType lang="zh_CN" custom/>
       </div>
     </div>
-    <a-modal v-model="conditionModifyVisible" width="800px" height="600px" @ok="showConditionModify" title="Modify Condition Required">
+    <a-modal v-model="conditionModifyVisible" v-if="conditionModifyVisible" width="800px" height="600px" @ok="showConditionModify" title="Modify Condition Required">
         <ConditionEditor :value="tree" :index="conditionIndex" />
     </a-modal>
     <a-modal v-model="visible" title="import json" width="800px" height="600x" @ok="handleImportJson">
@@ -51,7 +51,7 @@ export default {
       visible: false,
       conditionModifyVisible: false,
       conditions:[],
-      conditionIndex: 0,
+      conditionIndex: -1,
       tree:
       {
   "root": {
