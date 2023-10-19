@@ -142,6 +142,10 @@ export default {
       type: Object,
       required:true
     },
+    hasCondition: {
+      type: Boolean,
+      default: false
+    },
     disabled: { //name不可编辑，根节点name不可编辑,数组元素name不可编辑
       type: Boolean,
       default: false

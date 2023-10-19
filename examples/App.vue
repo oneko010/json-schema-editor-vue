@@ -6,13 +6,18 @@
     </div>
     <div class="desc">
       <div>A json-schema editor of high efficient and easy-to-use, base on Vue.
-        <a @click="visible = true">import json</a>
+        <a @click="conditionModifyVisible = true">import json</a>
       </div>
     </div>
     <div class="container">
       <codemirror class="code" v-model="jsonStr" :readOnly="false"/>
-      <json-schema-editor class="schema" :value="tree" disabledType lang="zh_CN" custom/>
+      <div class="editor">
+        <json-schema-editor class="schema" :value="tree" :hasCondition="conditions.length > 0" disabledType lang="zh_CN" custom/>
+      </div>
     </div>
+    <a-modal v-model="conditionModifyVisible" width="800px" height="600px" @ok="showConditionModify" title="Modify Condition Required">
+        <ConditionEditor :value="tree" :index="conditionIndex" />
+    </a-modal>
     <a-modal v-model="visible" title="import json" width="800px" height="600x" @ok="handleImportJson">
       <div class="code-container">
         <codemirror class="code" v-model="importJson" :readOnly="false"/>
@@ -25,9 +30,10 @@
 var app = require("../package.json");
 import Codemirror  from './components/Codemirror.vue'
 import GenerateSchema from 'generate-schema'
+import ConditionEditor from './components/ConditionEditor.vue'
 export default {
   name: 'App',
-  components: { Codemirror },
+  components: { Codemirror, ConditionEditor },
   computed: {
     jsonStr: {
       get: function () {
@@ -43,34 +49,223 @@ export default {
       version: app.version,
       importJson: '',
       visible: false,
+      conditionModifyVisible: false,
+      conditions:[],
+      conditionIndex: 0,
       tree:
       {
   "root": {
-    "type": "object",
-    "title": "条件",
-    "properties": {
-      "name": {
-        "type": "string",
-        "title": "名称",
-        "maxLength": 10,
-        "minLength": 2
+  "type": "object",
+  "properties": {
+    "acode": {
+      "enum": [
+        "67",
+        "42",
+        "38",
+        "44",
+        "43",
+        "45",
+        "40"
+      ]
+    },
+    "adsid": {
+      "type": "string"
+    },
+    "ad_po": {
+      "enum": [
+        "attach",
+        "detailcircle",
+        "detail_exc",
+        "detail_one",
+        "download_one",
+        "drama_sticker",
+        "exit",
+        "focus",
+        "homebanner",
+        "homeBanner2",
+        "homebanner_ani",
+        "homebanner_epi",
+        "homebanner_film",
+        "homebanner_show",
+        "homecircle",
+        "homedraw_epi",
+        "homedraw_film",
+        "home_float",
+        "inplay",
+        "launch",
+        "myBanner",
+        "new_svideo_feed1",
+        "pause",
+        "pre_ad",
+        "pre-roll",
+        "proscreen",
+        "quit",
+        "recom1",
+        "recom2",
+        "related_flow",
+        "search_proscreen",
+        "splash",
+        "svideo_back",
+        "svideo_feed1",
+        "svideo_feed2",
+        "svideo_flow",
+        "svideo_flow_game",
+        "videoclipsfeeds",
+        "window_sticker"
+      ]
+    },
+    "ad_pro": {
+      "type": "string"
+    },
+    "ad_type": {
+      "enum": [
+        "dadi",
+        "dadi2"
+      ]
+    },
+    "tid": {
+      "type": "string"
+    },
+    "cp_adid": {
+      "type": "string"
+    },
+    "idea_type": {
+      "type": "string"
+    },
+    "errorcode": {
+      "type": "number"
+    },
+    "result": {
+      "enum": [
+        "success",
+        "fail",
+        "error",
+        "nofill",
+        "failure"
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "acode": {
+            "const": "67"
+          }
+        }
       },
-      "appId": {
-        "type": "integer",
-        "title": "应用ID"
-      },
-      "credate": {
-        "type": "string",
-        "title": "创建日期",
-        "format": "date"
+      "then": {
+        "required": [
+          "acode",
+          "adsid",
+          "ad_po"
+        ]
       }
     },
-    "required": [
-      "name",
-      "appId",
-      "credate"
-    ]
-  }
+    {
+      "if": {
+        "properties": {
+          "acode": {
+            "const": "42"
+          }
+        }
+      },
+      "then": {
+        "if": {
+          "properties": {
+            "result": {
+              "const": "success"
+            }
+          }
+        },
+        "then": {
+          "required": [
+            "acode",
+            "adsid",
+            "ad_po",
+            "ad_pro",
+            "tid"
+          ]
+        },
+        "else": {
+          "required": [
+            "acode",
+            "adsid",
+            "ad_po"
+          ]
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "acode": {
+            "enum": [
+              "38"
+            ]
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "acode",
+          "adsid",
+          "cp_adid",
+          "ad_po",
+          "ad_pro",
+          "tid"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "acode": {
+            "enum": [
+              "44",
+              "45",
+              "40"
+            ]
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "acode",
+          "adsid",
+          "cp_adid",
+          "ad_po",
+          "ad_pro",
+          "tid",
+          "idea_type"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "acode": {
+            "enum": [
+              "43"
+            ]
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "acode",
+          "adsid",
+          "cp_adid",
+          "ad_po",
+          "ad_pro",
+          "tid",
+          "errorcode"
+        ]
+      }
+    }
+  ]
+}
+
 }
     }
   },
@@ -80,6 +275,9 @@ export default {
       delete t.$schema
       this.tree.root = t
       this.visible = false
+    },
+    showConditionModify() {
+
     }
   }
 }
@@ -121,10 +319,14 @@ export default {
   max-height: 600px;
   overflow: auto;
 }
+.editor{
+  display: flex;
+  flex-direction: column;
+}
 .schema{
   margin-left: 20px;
-  width:50%;
-  height: 100%;
+  width:100%;
+  height: 50%;
   overflow-y: auto;
   overflow-x:hidden;
   border:1px solid rgba(0,0,0,.1);
