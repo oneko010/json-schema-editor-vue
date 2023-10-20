@@ -8,6 +8,28 @@ export default {
             
         }
     },
+    created() {
+        const node = this.pickValue
+        node.allOf || this.$set(node, 'allOf', [])
+
+        if (this.index < 0) {
+            const conditionObject = {
+                "if": {
+                    "properties": {
+                        "bbb": {
+                            "const": "67"
+                        }
+                    }
+                }, 
+                "then": {
+                    "required": [
+                        "a"
+                    ]
+                }
+            }
+            node.allOf.push(conditionObject)
+        }
+    },
     props: {
         value: {
             type: Object,
@@ -35,28 +57,9 @@ export default {
                 const node = this.pickValue
                 node.allOf || this.$set(node, 'allOf', [])
 
-                let index = this.index
-                if (index < 0) {
-                    const conditionObject = {
-                        "if": {
-                            "properties": {
-                                "bbb": {
-                                    "const": "67"
-                                }
-                            }
-                        }, 
-                        "then": {
-                            "required": [
-                                "a"
-                            ]
-                        }
-                    }
-                    index = node.allOf.length
-                    console.log(node.allOf.length)
-                    node.allOf[index] = conditionObject
-                    console.log(node)
-                }
+                let index = this.index < 0 ? node.allOf.length - 1 : this.index
                 const ifnode = node.allOf[index].if
+                
                 ifnode.type || this.$set(ifnode, "type", "object")
                 const conditionNode = {}
                 this.$set(conditionNode, "if", ifnode)
