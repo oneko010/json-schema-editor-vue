@@ -81,6 +81,10 @@ export default {
         },
         removeNode(index) {
             console.log("removeNode" + index)
+            this.pickValue.allOf.splice(index, 1)
+            if (this.pickValue.allOf.length == 0) {
+                this.$delete(this.pickValue, "allOf")
+            }
         }
     }
 
