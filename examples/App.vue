@@ -6,14 +6,14 @@
     </div>
     <div class="desc">
       <div>A json-schema editor of high efficient and easy-to-use, base on Vue.
-        <a @click="conditionModifyVisible = true">import json</a>
+        <a @click="visible = true">import json</a>
       </div>
     </div>
     <div class="container">
       <codemirror class="code" v-model="jsonStr" :readOnly="false"/>
       <div class="editor">
         <json-schema-editor class="schema" :value="tree" :hasCondition="conditions.length > 0" disabledType lang="zh_CN" custom/>
-        <ConditionList class="condition" :value="tree" />
+        <ConditionList class="condition" :value="tree" :modify-condition="modifyCondition" />
       </div>
     </div>
     <a-modal v-model="conditionModifyVisible" v-if="conditionModifyVisible" width="800px" height="600px" @ok="showConditionModify" title="Modify Condition Required">
@@ -280,6 +280,10 @@ export default {
     },
     showConditionModify() {
 
+    },
+    modifyCondition(index) {
+      this.conditionIndex = index
+      this.conditionModifyVisible = true
     }
   }
 }
