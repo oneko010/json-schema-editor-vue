@@ -13,6 +13,7 @@
       <codemirror class="code" v-model="jsonStr" :readOnly="false"/>
       <div class="editor">
         <json-schema-editor class="schema" :value="tree" :hasCondition="conditions.length > 0" disabledType lang="zh_CN" custom/>
+        <ConditionList class="condition" :value="tree" />
       </div>
     </div>
     <a-modal v-model="conditionModifyVisible" v-if="conditionModifyVisible" width="800px" height="600px" @ok="showConditionModify" title="Modify Condition Required">
@@ -31,9 +32,10 @@ var app = require("../package.json");
 import Codemirror  from './components/Codemirror.vue'
 import GenerateSchema from 'generate-schema'
 import ConditionEditor from './components/ConditionEditor.vue'
+import ConditionList from './components/ConditionList.vue'
 export default {
   name: 'App',
-  components: { Codemirror, ConditionEditor },
+  components: { Codemirror, ConditionEditor, ConditionList },
   computed: {
     jsonStr: {
       get: function () {
@@ -323,7 +325,7 @@ export default {
   display: flex;
   flex-direction: column;
 }
-.schema{
+.schema, .condition{
   margin-left: 20px;
   width:100%;
   height: 50%;
@@ -332,6 +334,9 @@ export default {
   border:1px solid rgba(0,0,0,.1);
   border-radius: 8px;
   padding: 12px;
+}
+.condition {
+  margin-top: 10px;
 }
 .CodeMirror {
   height: 100% !important;
