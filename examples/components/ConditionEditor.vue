@@ -44,14 +44,6 @@ export default {
         pickValue(){
             return  Object.values(this.value)[0]
         },
-        jsonStr: {
-            get: function () {
-                return JSON.stringify(this.value, null, 2)
-            },
-            set: function (newVal) {
-                this.value = JSON.parse(newVal)
-            }
-        },
         condition: {
             get: function() {
                 const node = this.pickValue
@@ -65,6 +57,21 @@ export default {
                 this.$set(conditionNode, "if", ifnode)
 
                 return conditionNode
+            }
+        }
+    },
+    methods: {
+        submit() {
+            const node = this.pickValue
+            node.allOf || this.$set(node, 'allOf', [])
+
+            let index = this.index < 0 ? node.allOf.length - 1 : this.index
+            const ifnode = node.allOf[index].if
+            if (Object.keys(ifnode.properties).length == 0) {
+                node.allOf.splice(this.index, 1)
+            }
+            if (node.allOf.length == 0) {
+                this.$delete(node,'allOf')
             }
         }
     }

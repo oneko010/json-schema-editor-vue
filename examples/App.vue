@@ -16,8 +16,8 @@
         <ConditionList class="condition" :value="tree" :modify-condition="modifyCondition" />
       </div>
     </div>
-    <a-modal v-model="conditionModifyVisible" v-if="conditionModifyVisible" width="800px" height="600px" @ok="showConditionModify" title="Modify Condition Required">
-        <ConditionEditor :value="tree" :index="conditionIndex" />
+    <a-modal v-model="conditionModifyVisible" v-if="conditionModifyVisible" width="800px" height="600px" @ok="submitCondition" title="Modify Condition Required">
+        <ConditionEditor ref="conditionEditor" :value="tree" :index="conditionIndex" />
     </a-modal>
     <a-modal v-model="visible" title="import json" width="800px" height="600x" @ok="handleImportJson">
       <div class="code-container">
@@ -278,8 +278,9 @@ export default {
       this.tree.root = t
       this.visible = false
     },
-    showConditionModify() {
-
+    submitCondition() {
+      this.$refs.conditionEditor.submit()
+      this.conditionModifyVisible = false
     },
     modifyCondition(index) {
       this.conditionIndex = index
