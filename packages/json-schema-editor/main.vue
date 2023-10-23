@@ -59,6 +59,8 @@
         <h3 v-text="local['base_setting']">基础设置</h3>
         <a-form v-model="advancedValue" class="ant-advanced-search-form">
           <a-row :gutter="6">
+            <p>{{ advancedValue }}</p>
+            <p>{{ advancedAttr }}</p>
             <a-col :span="8" v-for="(item,key) in advancedValue" :key="key">
               <a-form-item>
                 <span>{{ local[key] }}</span>
@@ -393,7 +395,7 @@ export default {
     onSetting(){
         console.log("onSettingCallback" + this.onSettingCallback)
       if (this.onSettingCallback) {
-        this.onSettingCallback()
+        this.onSettingCallback(this.pickValue)
       } else {
         this.modalVisible = true
         this.advancedValue = { ...this.advanced.value }

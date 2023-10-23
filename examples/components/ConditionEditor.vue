@@ -11,7 +11,8 @@ export default {
     },
     data() {
         return {
-            visible: false
+            visible: false,
+            advancedValue: {},
         }
     },
     created() {
@@ -44,6 +45,10 @@ export default {
         index: {
             type: Number,
             default: -1
+        },
+        custom: { //enable custom properties
+        type: Boolean,
+        default: false
         }
     },
     computed: {
@@ -125,7 +130,8 @@ export default {
                 thennode.required.splice(0, thennode.required.length)
             }
         },
-        modifyProperty() {
+        modifyProperty(property) {
+            this.advancedValue = property
             this.visible = true
         },
         submitProperty() {
@@ -145,7 +151,7 @@ export default {
         <a-checkbox @change="selectedAllChanged" :checked="selectedPropertyList.length == propertyList.length">全选</a-checkbox>
         </div>
         <a-modal v-model="visible" v-if="visible"  width="800px" height="600px" @ok="submitProperty" title="Modify Condition Required">
-            <PropertyEditor />
+            <PropertyEditor :value="advancedValue" :custom="custom"/>
         </a-modal>
     </div>
 </template>
