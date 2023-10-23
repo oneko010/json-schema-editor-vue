@@ -50,7 +50,7 @@
         </a-col>
       </a-row>
       <template v-if="!hidden&&pickValue.properties && !isArray">
-        <json-schema-editor  v-for="(item,key,index) in pickValue.properties" :value="{[key]:item}" :parent="pickValue" :key="index" :deep="deep+1" :root="false" class="children" :lang="lang" :custom="custom"/>
+        <json-schema-editor  v-for="(item,key,index) in pickValue.properties" :value="{[key]:item}" :parent="pickValue" :key="index" :deep="deep+1" :root="false" class="children" :lang="lang" :custom="custom" :onSettingCallback="onSettingCallback"/>
       </template>
       <template v-if="isArray">
         <json-schema-editor  :value="{items:pickValue.items}" :deep="deep+1" disabled isItem :root="false" class="children" :lang="lang" :custom="custom"/>
@@ -177,6 +177,9 @@ export default {
     lang: { // i18n language
       type: String,
       default: 'zh_CN'
+    },
+    onSettingCallback: {
+      type: Function
     }
   },
   computed: {
@@ -388,14 +391,19 @@ export default {
       return  `field_${this.deep}_${this.countAdd++}`
     },
     onSetting(){
-      this.modalVisible = true
-      this.advancedValue = { ...this.advanced.value }
-      for(const k in this.advancedValue) {
-        if(this.pickValue[k]) {
-          this.advancedValue[k] = this.pickValue[k]
+        console.log("onSettingCallback" + this.onSettingCallback)
+      if (this.onSettingCallback) {
+        this.onSettingCallback()
+      } else {
+        this.modalVisible = true
+        this.advancedValue = { ...this.advanced.value }
+        for(const k in this.advancedValue) {
+          if(this.pickValue[k]) {
+            this.advancedValue[k] = this.pickValue[k]
+          }
         }
+        this.parseCustomProps()
       }
-      this.parseCustomProps()
     },
 
     handleOk(){

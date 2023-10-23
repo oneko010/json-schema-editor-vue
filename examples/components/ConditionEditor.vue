@@ -1,12 +1,17 @@
 <script>
 import Vue from 'vue'
 import { Modal, Checkbox } from 'ant-design-vue'
+import PropertyEditor from '../../packages/json-schema-editor/PropertyEditor.vue'
 Modal.install(Vue)
 export default {
-    components: { ACheckbox: Checkbox },
+    components: { 
+        ACheckbox: Checkbox, 
+        PropertyEditor, 
+        AModal: Modal 
+    },
     data() {
         return {
-            
+            visible: false
         }
     },
     created() {
@@ -120,6 +125,12 @@ export default {
                 thennode.required.splice(0, thennode.required.length)
             }
         },
+        modifyProperty() {
+            this.visible = true
+        },
+        submitProperty() {
+
+        }
         
     }
 }
@@ -128,11 +139,14 @@ export default {
 <template>
     <div>
         <p>{{ propertyList }}</p>
-        <json-schema-editor class="schema" :value="condition" disabledType lang="zh_CN" custom/>
+        <json-schema-editor class="schema" :value="condition" :onSettingCallback="modifyProperty" disabledType lang="zh_CN" custom/>
         <div class="required">
         <a-checkbox v-for="item in propertyList" :key="item" :checked="selectedPropertyList.includes(item)" class="ant-col-name-required" @change="propertySelectChanged(item)">{{ item }}</a-checkbox>
         <a-checkbox @change="selectedAllChanged" :checked="selectedPropertyList.length == propertyList.length">全选</a-checkbox>
         </div>
+        <a-modal v-model="visible" v-if="visible"  width="800px" height="600px" @ok="submitProperty" title="Modify Condition Required">
+            <PropertyEditor />
+        </a-modal>
     </div>
 </template>
 
