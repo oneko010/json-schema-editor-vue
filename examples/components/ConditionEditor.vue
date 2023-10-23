@@ -47,8 +47,8 @@ export default {
             default: -1
         },
         custom: { //enable custom properties
-        type: Boolean,
-        default: false
+            type: Boolean,
+            default: true
         }
     },
     computed: {

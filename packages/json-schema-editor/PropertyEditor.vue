@@ -26,6 +26,31 @@
                 </a-form-item>
             </a-col>
         </a-row>
+        <h3 v-text="local['add_custom']" v-show="custom">添加自定义属性</h3>
+          <a-row :gutter="6">
+            <a-col :span="8" v-for="item in customProps" :key="item.key">
+              <a-form-item :label="item.key">
+                <a-input v-model="item.value" style="width:calc(100% - 30px)"/>
+                <a-button icon="close" type="link" @click="removeCustomNode(item.key)" style="width:30px"></a-button>  
+              </a-form-item>
+            </a-col>
+            <a-col :span="8" v-show="addProp.key != undefined">
+              <a-form-item>
+                <a-input slot="label" v-model="addProp.key" style="width:100px"/>
+                <a-input v-model="addProp.value" style="width:100%"/>
+              </a-form-item>
+            </a-col>
+            <a-col :span="8">
+              <a-form-item>
+                <a-button icon="check" type="link" @click="confirmAddCustomNode(null)" v-if="customing"></a-button>  
+                <a-tooltip :title="local['add_custom']" v-else>
+                  <a-button icon="plus" type="link" @click="addCustomNode"></a-button>  
+                </a-tooltip>
+              </a-form-item>
+            </a-col>
+          </a-row> 
+        <h3 v-text="local['preview']">预览</h3>
+        <pre style="width:100%">{{completeNodeValue}}</pre>
     </div>
 </template>
 
@@ -33,7 +58,7 @@
 import LocalProvider from './LocalProvider'
 import {TYPE_NAME, TYPE} from './type/type'
 // import { Row,Col,Button,Input,InputNumber, Icon,Checkbox,Select,Tooltip,Modal,Form,Switch} from 'ant-design-vue'
-import { Row,Col, Icon,Form,Input, InputNumber, Switch, Select} from 'ant-design-vue'
+import { Row,Col, Icon,Form,Input, InputNumber, Switch, Select,Tooltip, Button} from 'ant-design-vue'
 export default {
     props: {
         lang: { // i18n language
@@ -51,7 +76,7 @@ export default {
     },
     components: {
         ARow:Row,ACol:Col,
-        // AButton: Button,
+        AButton: Button,
         // eslint-disable-next-line vue/no-unused-components
         AIcon: Icon,
         AInput: Input,
@@ -60,7 +85,7 @@ export default {
         // ACheckbox: Checkbox,
         ASelect: Select,
         ASelectOption:Select.Option,
-        // ATooltip: Tooltip,
+        ATooltip: Tooltip,
         // AModal:Modal,
         // AForm:Form,
         AFormItem: Form.Item,
@@ -69,30 +94,13 @@ export default {
     computed: {
         advancedAttr() {
             console.log(this.value)
-            return TYPE[this.value['type']].attr
+            return TYPE[this.value['type']].attr || {}
         },
         enumText () {
-        const t = this.advancedValue['enum']
-        if (!t) return ''
-        if (!t.length) return ''
-        return t.join('\n')
-        }
-    },
-    data() {
-        return {
-            TYPE_NAME,
-            local: LocalProvider(this.lang),
-            customProps: [],
-            addProp: {},
-            customing: false,
-            advancedValue: {}
-        }
-    },
-    methods: {
-        addCustomNode(){
-            this.$set(this.addProp,'key',this._joinName())
-            this.$set(this.addProp,'value','')
-            this.customing = true
+            const t = this.advancedValue['enum']
+            if (!t) return ''
+            if (!t.length) return ''
+            return t.join('\n')
         },
         completeNodeValue(){
             const t = {}
@@ -103,25 +111,77 @@ export default {
             this._pickDiffKey().forEach(key => delete basicValue[key])
             return Object.assign({}, basicValue, t,this.advancedNotEmptyValue)
         },
+
+        ownProps () {
+            return [ 'type', 'title', 'properties', 'items','required', ...Object.keys(this.advancedAttr)]
+        }
+    },
+    data() {
+        return {
+            TYPE_NAME,
+            local: LocalProvider(this.lang),
+            customProps: [],
+            addProp: {},
+            customing: false,
+            advancedValue: {},
+            customPropIndex: 0
+        }
+    },
+    methods: {
+        addCustomNode(){
+            this.$set(this.addProp,'key',this._joinName())
+            this.$set(this.addProp,'value','')
+            this.customing = true
+        },
+        removeCustomNode(key) {
+            this.customProps.forEach((item,index) => {
+                if (item.key === key) {
+                this.customProps.splice(index,1)
+                return
+                }
+            })
+        },
+        confirmAddCustomNode(prop) {
+            const p = prop || this.addProp
+            let existKey = false
+            this.customProps.forEach(item => {
+                if (item.key === p.key) {
+                existKey = true
+                }
+            })
+            if (existKey) return
+            this.customProps.push(p)
+            this.addProp = {}
+            this.customing = false
+        },
         changeEnumValue (e) {
-            const pickType = this.pickValue.type
+            const pickType = this.value.type
             const value = e.target.value
 
             if(!value || value===''){
-                this.advancedValue.enum = null
+                this.value.enum = null
                 return
             }
             var arr = value.split('\n')
 
             if (pickType === 'string') {
-                this.advancedValue.enum = arr.map(item => item);
+                this.value.enum = arr.map(item => item);
             } else {
                 if(arr.length ===0 || (arr.length === 1 && arr[0]=='')) {
-                this.advancedValue.enum = null
+                    this.value.enum = null
                 }else {
-                this.advancedValue.enum = arr.map(item => +item);
+                    this.value.enum = arr.map(item => +item);
                 }
             }
+        },
+        _pickDiffKey () {
+            const keys = Object.keys(this.value)
+            return keys.filter(item => this.ownProps.indexOf(item) === -1)
+        },
+        _joinName() {
+            const index = this.customPropIndex
+            this.customPropIndex++
+            return "field_" + index
         }
     },
     created() {
@@ -137,5 +197,28 @@ export default {
 </script>
 
 <style>
-
+.json-schema-editor-advanced-modal {
+  color: rgba(0, 0, 0, 0.65);
+  min-width: 600px;
+}
+.json-schema-editor-advanced-modal pre {
+  font-family: monospace;
+  height: 100%;
+  overflow-y: auto;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+  padding: 12px;
+  width: 50%;
+}
+.json-schema-editor-advanced-modal h3 {
+  display: block;
+  border-left: 3px solid #1890ff;
+  padding: 0 8px;
+}
+.json-schema-editor-advanced-modal .ant-advanced-search-form .ant-form-item {
+  display: flex;
+}
+.json-schema-editor-advanced-modal .ant-advanced-search-form .ant-form-item .ant-form-item-control-wrapper {
+  flex: 1;
+}
 </style>
