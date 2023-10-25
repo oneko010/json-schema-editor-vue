@@ -104,7 +104,7 @@
               <a-form-item>
                 <a-button icon="check" type="link" @click="confirmAddCustomNode(null)" v-if="customing"></a-button>  
                 <a-tooltip :title="local['add_custom']" v-else>
-                  <a-button icon="plus" type="link" @click="addCustomNode"></a-button>  
+                  <a-button icon="plus" type="link" @click="addCustomNode"></a-button>
                 </a-tooltip>
               </a-form-item>
             </a-col>
@@ -129,7 +129,8 @@ export default {
     AButton: Button,
     // eslint-disable-next-line vue/no-unused-components
     AIcon: Icon,
-    AInput: Input,AInputNumber:InputNumber,ATextarea: Input.TextArea,
+    AInput: Input,AInputNumber:InputNumber,
+    ATextarea: Input.TextArea,
     ACheckbox: Checkbox,
     ASelect: Select,
     ASelectOption:Select.Option,
@@ -393,7 +394,6 @@ export default {
       return  `field_${this.deep}_${this.countAdd++}`
     },
     onSetting(){
-        console.log("onSettingCallback" + this.onSettingCallback)
       if (this.onSettingCallback) {
         this.onSettingCallback(this.pickValue)
       } else {
@@ -418,6 +418,7 @@ export default {
         }
       }
       const diffKey = this._pickDiffKey()
+      console.log("diffkey " + diffKey)
       diffKey.forEach(key => this.$delete(this.pickValue,key))
       for(const item of this.customProps){
         this.$set(this.pickValue,item.key,item.value)
@@ -425,6 +426,7 @@ export default {
     },
     _pickDiffKey () {
       const keys = Object.keys(this.pickValue)
+      console.log("keys " + keys)
       return keys.filter(item => this.ownProps.indexOf(item) === -1)
     }
   }

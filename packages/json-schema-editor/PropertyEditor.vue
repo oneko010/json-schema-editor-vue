@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="json-schema-editor-advanced-modal">
         <a-row :gutter="6">
             <p>{{ advancedValue }}</p>
             <p>{{ advancedAttr }}</p>
@@ -27,7 +27,8 @@
             </a-col>
         </a-row>
         <h3 v-text="local['add_custom']" v-show="custom">添加自定义属性</h3>
-          <a-row :gutter="6">
+        <a-form class="ant-advanced-search-form" v-show="custom">
+        <a-row :gutter="6">
             <a-col :span="8" v-for="item in customProps" :key="item.key">
               <a-form-item :label="item.key">
                 <a-input v-model="item.value" style="width:calc(100% - 30px)"/>
@@ -48,13 +49,15 @@
                 </a-tooltip>
               </a-form-item>
             </a-col>
-          </a-row> 
+        </a-row> 
+        </a-form>
         <h3 v-text="local['preview']">预览</h3>
-        <pre style="width:100%">{{completeNodeValue}}</pre>
+        <pre style="width:100%" class="pre">{{completeNodeValue}}</pre>
     </div>
 </template>
 
 <script>
+import { isNull } from './util'
 import LocalProvider from './LocalProvider'
 import {TYPE_NAME, TYPE} from './type/type'
 // import { Row,Col,Button,Input,InputNumber, Icon,Checkbox,Select,Tooltip,Modal,Form,Switch} from 'ant-design-vue'
@@ -87,13 +90,12 @@ export default {
         ASelectOption:Select.Option,
         ATooltip: Tooltip,
         // AModal:Modal,
-        // AForm:Form,
+        AForm:Form,
         AFormItem: Form.Item,
         ASwitch: Switch
     },
     computed: {
         advancedAttr() {
-            console.log(this.value)
             return TYPE[this.value['type']].attr || {}
         },
         enumText () {
@@ -102,18 +104,32 @@ export default {
             if (!t.length) return ''
             return t.join('\n')
         },
+        advancedNotEmptyValue(){
+            const jsonNode = Object.assign({},this.advancedValue);
+            for(let key in jsonNode){
+                isNull(jsonNode[key]) && delete jsonNode[key]
+            }
+            return jsonNode
+        },
         completeNodeValue(){
             const t = {}
-            const basicValue = { ...this.pickValue }
+            const basicValue = { ...this.advancedValue }
             for(const item of this.customProps){
                 t[item.key] = item.value
             }
             this._pickDiffKey().forEach(key => delete basicValue[key])
-            return Object.assign({}, basicValue, t,this.advancedNotEmptyValue)
+            let node = Object.assign({}, basicValue, t,this.advancedNotEmptyValue)
+            const ownProps = this.ownProps
+            for (const index in ownProps) {
+                const key = ownProps[index]
+                if (this.value[key] && !Object.keys(node).includes(key)) {
+                    this.$set(node, key, this.value[key])
+                }
+            }
+            return node
         },
-
         ownProps () {
-            return [ 'type', 'title', 'properties', 'items','required', ...Object.keys(this.advancedAttr)]
+            return ['type', 'title', 'properties', 'items','required', ...Object.keys(this.advancedAttr)]
         }
     },
     data() {
@@ -123,7 +139,9 @@ export default {
             customProps: [],
             addProp: {},
             customing: false,
-            advancedValue: {},
+            advancedValue: {
+                "type": ""
+            },
             customPropIndex: 0
         }
     },
@@ -146,7 +164,7 @@ export default {
             let existKey = false
             this.customProps.forEach(item => {
                 if (item.key === p.key) {
-                existKey = true
+                    existKey = true
                 }
             })
             if (existKey) return
@@ -159,20 +177,21 @@ export default {
             const value = e.target.value
 
             if(!value || value===''){
-                this.value.enum = null
+                this.$delete(this.advancedValue, 'enum')
                 return
             }
             var arr = value.split('\n')
 
             if (pickType === 'string') {
-                this.value.enum = arr.map(item => item);
+                this.$set(this.advancedValue, 'enum', arr.map(item => item))
             } else {
                 if(arr.length ===0 || (arr.length === 1 && arr[0]=='')) {
-                    this.value.enum = null
+                    this.advancedValue.enum = null
                 }else {
-                    this.value.enum = arr.map(item => +item);
+                    this.advancedValue.enum = arr.map(item => +item);
                 }
             }
+            console.log("enum: "+ JSON.stringify(this.advancedValue))
         },
         _pickDiffKey () {
             const keys = Object.keys(this.value)
@@ -182,14 +201,19 @@ export default {
             const index = this.customPropIndex
             this.customPropIndex++
             return "field_" + index
+        },
+        getFinalProperty() {
+            return this.completeNodeValue
         }
     },
     created() {
         const valueType = this.value['type'] || "string"
-        this.advancedValue = TYPE[valueType].value
-        for (const k in this.advancedValue) {
-            if (this.value[k]) {
-                this.advancedValue[k] = this.value[k]
+        this.advancedValue = {...TYPE[valueType].value}
+        const keys = Object.keys(this.advancedValue)
+        for (const index in keys) {
+            const key = keys[index]
+            if (this.value[key]) {
+                this.$set(this.advancedValue, key, this.value[key])
             }
         }
     }

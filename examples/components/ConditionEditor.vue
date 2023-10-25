@@ -2,6 +2,7 @@
 import Vue from 'vue'
 import { Modal, Checkbox } from 'ant-design-vue'
 import PropertyEditor from '../../packages/json-schema-editor/PropertyEditor.vue'
+import { isNull } from '../../packages/json-schema-editor/util'
 Modal.install(Vue)
 export default {
     components: { 
@@ -84,6 +85,9 @@ export default {
             let index = this.index < 0 ? node.allOf.length - 1 : this.index
             const thennode = node.allOf[index].then
             return thennode.required
+        },
+        ownProps () {
+            return [ 'type', 'title', 'properties', 'items','required', ...Object.keys(this.advancedAttr)]
         }
     },
     methods: {
@@ -135,23 +139,35 @@ export default {
             this.visible = true
         },
         submitProperty() {
-
+            this.visible = false
+            const finalProperty = this.$refs.propertyEditor.getFinalProperty()
+            const keys = this.$refs.propertyEditor.ownProps
+            for (const index in keys) {
+                const key = keys[index]
+                console.log("set key " + key + " value " + finalProperty[key])
+                console.log(isNull(finalProperty[key]))
+                if (!isNull(finalProperty[key])) {
+                    this.$set(this.advancedValue, key, finalProperty[key])
+                } else {
+                    this.$delete(this.advancedValue, key)
+                }
+            }
+            console.log("submit" + JSON.stringify(this.advancedValue))
         }
-        
     }
 }
 </script>
 
 <template>
     <div>
-        <p>{{ propertyList }}</p>
+        <p>{{ condition }}</p>
         <json-schema-editor class="schema" :value="condition" :onSettingCallback="modifyProperty" disabledType lang="zh_CN" custom/>
         <div class="required">
         <a-checkbox v-for="item in propertyList" :key="item" :checked="selectedPropertyList.includes(item)" class="ant-col-name-required" @change="propertySelectChanged(item)">{{ item }}</a-checkbox>
         <a-checkbox @change="selectedAllChanged" :checked="selectedPropertyList.length == propertyList.length">全选</a-checkbox>
         </div>
         <a-modal v-model="visible" v-if="visible"  width="800px" height="600px" @ok="submitProperty" title="Modify Condition Required">
-            <PropertyEditor :value="advancedValue" :custom="custom"/>
+            <PropertyEditor :value="advancedValue" :custom="custom" ref="propertyEditor" />
         </a-modal>
     </div>
 </template>
