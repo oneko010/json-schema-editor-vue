@@ -7,6 +7,7 @@
     <div class="desc">
       <div>A json-schema editor of high efficient and easy-to-use, base on Vue.
         <a @click="visible = true">import json</a>
+        <input type="file" @change="getFile" />
       </div>
     </div>
     <div class="container">
@@ -285,6 +286,18 @@ export default {
     modifyCondition(index) {
       this.conditionIndex = index
       this.conditionModifyVisible = true
+    },
+    getFile(event) {
+      const file = event.target.files[0]
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        console.log(e.target.result)
+        // console.log(typeof e.target.result)
+        const  t = JSON.parse(e.target.result)
+        delete t.$schema
+        this.tree.root = t
+      }
+      reader.readAsText(file)
     }
   }
 }
