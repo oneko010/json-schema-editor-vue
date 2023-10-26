@@ -144,15 +144,19 @@ export default {
             const keys = this.$refs.propertyEditor.ownProps
             for (const index in keys) {
                 const key = keys[index]
-                console.log("set key " + key + " value " + finalProperty[key])
-                console.log(isNull(finalProperty[key]))
                 if (!isNull(finalProperty[key])) {
                     this.$set(this.advancedValue, key, finalProperty[key])
                 } else {
                     this.$delete(this.advancedValue, key)
                 }
             }
-            console.log("submit" + JSON.stringify(this.advancedValue))
+            const finalKeys = Object.keys(finalProperty)
+            for (const index in finalKeys) {
+                const key = finalKeys[index]
+                if (!keys.includes(key)) {
+                    this.$set(this.advancedValue, key, finalProperty[key])
+                }
+            }
         }
     }
 }

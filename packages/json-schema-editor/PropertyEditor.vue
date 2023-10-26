@@ -126,6 +126,7 @@ export default {
                     this.$set(node, key, this.value[key])
                 }
             }
+            console.log(JSON.stringify(node))
             return node
         },
         ownProps () {
@@ -210,10 +211,18 @@ export default {
         const valueType = this.value['type'] || "string"
         this.advancedValue = {...TYPE[valueType].value}
         const keys = Object.keys(this.advancedValue)
+        console.log(keys)
         for (const index in keys) {
             const key = keys[index]
             if (this.value[key]) {
                 this.$set(this.advancedValue, key, this.value[key])
+            }
+        }
+        const valueKeys = Object.keys(this.value)
+        for (const index in valueKeys) {
+            const key = valueKeys[index]
+            if (!this.ownProps.includes(key)) {
+                this.confirmAddCustomNode({"key": key, "value": this.value[key]})
             }
         }
     }
