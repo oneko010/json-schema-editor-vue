@@ -6,8 +6,9 @@
     </div>
     <div class="desc">
       <div>A json-schema editor of high efficient and easy-to-use, base on Vue.
-        <a @click="visible = true">import json</a>
+        <!-- <a @click="visible = true">import json</a> -->
         <input type="file" @change="getFile" />
+        <button @click="saveFile">下载schema</button>
       </div>
     </div>
     <div class="container">
@@ -291,13 +292,22 @@ export default {
       const file = event.target.files[0]
       const reader = new FileReader()
       reader.onload = (e) => {
-        console.log(e.target.result)
-        // console.log(typeof e.target.result)
         const  t = JSON.parse(e.target.result)
         delete t.$schema
         this.tree.root = t
       }
       reader.readAsText(file)
+    },
+    saveFile() {
+      const textToSave = JSON.stringify(this.tree.root, null, 2)
+      const blob = new Blob([textToSave], { type: "text/json" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.download = "schema.json"
+      link.href = url;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     }
   }
 }
