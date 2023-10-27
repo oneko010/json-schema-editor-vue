@@ -24,15 +24,10 @@ export default {
             const conditionObject = {
                 "if": {
                     "properties": {
-                        "bbb": {
-                            "const": "67"
-                        }
                     }
                 }, 
                 "then": {
-                    "required": [
-                        "a"
-                    ]
+                    "required": []
                 }
             }
             node.allOf.push(conditionObject)
