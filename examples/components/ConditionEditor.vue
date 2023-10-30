@@ -136,6 +136,8 @@ export default {
         submitProperty() {
             this.visible = false
             const finalProperty = this.$refs.propertyEditor.getFinalProperty()
+
+            // 更新/删除固定属性
             const keys = this.$refs.propertyEditor.ownProps
             for (const index in keys) {
                 const key = keys[index]
@@ -145,11 +147,20 @@ export default {
                     this.$delete(this.advancedValue, key)
                 }
             }
+            // 更新自定义属性
             const finalKeys = Object.keys(finalProperty)
             for (const index in finalKeys) {
                 const key = finalKeys[index]
                 if (!keys.includes(key)) {
                     this.$set(this.advancedValue, key, finalProperty[key])
+                }
+            }
+            // 清除编辑后没有指定的自定义属性
+            const valueKeys = Object.keys(this.advancedValue)
+            for (const index in valueKeys) {
+                const key = valueKeys[index] 
+                if (!keys.includes(key) && !finalKeys.includes(key)) {
+                    this.$delete(this.advancedValue, key)
                 }
             }
         }
