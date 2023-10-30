@@ -19,6 +19,18 @@ export function isNull(ele){
     return true;
   }else if(ele===''){
     return true;
+  }else if (Array.isArray(ele)) {
+    let isEmpty = true
+    for (const index in ele) {
+      const element = ele[index]
+      if (!isNull(element)) {
+        isEmpty = false
+        break
+      }
+    }
+    if (isEmpty) {
+      return true
+    }
   }
   return false;
 }
