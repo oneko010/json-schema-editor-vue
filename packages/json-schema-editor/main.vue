@@ -31,7 +31,7 @@
           <a-input :value="pickValue.title" class="ant-col-title" :placeholder="local['title']" @blur="onInputTitle"/>
         </a-col>
         <a-col :span="6" class="ant-col-setting">
-          <a-tooltip>
+          <a-tooltip v-if="!root">
             <span slot="title" v-text="local['adv_setting']">高级设置</span>
             <a-button type="link" icon="setting" class="setting-icon" @click="onSetting"/>
           </a-tooltip>
