@@ -1,6 +1,5 @@
 const LodashModuleReplacementPlugin = require("lodash-webpack-plugin")
 const webpack = require('webpack')
-const path = require('path')
 module.exports = {
 	publicPath: './',
 	productionSourceMap: false,
@@ -17,7 +16,8 @@ module.exports = {
         resourceRegExp: /^\.\/locale$/,
         contextRegExp: /moment$/,
       }),
-    ]
+    ],
+    devtool: 'source-map'
   },
   chainWebpack(config) {
     if(process.env.analyzer) config.plugin('webpack-report').use(require('webpack-bundle-analyzer').BundleAnalyzerPlugin)
