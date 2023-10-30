@@ -8,6 +8,7 @@
       <div>A json-schema editor of high efficient and easy-to-use, base on Vue.
         <!-- <a @click="visible = true">import json</a> -->
         <input type="file" @change="getFile" />
+        <span>保存文件：</span><input v-model="saveFileName" />
         <button @click="saveFile">下载schema</button>
       </div>
     </div>
@@ -56,6 +57,7 @@ export default {
       conditionModifyVisible: false,
       conditions:[],
       conditionIndex: -1,
+      saveFileName: "schema.json",
       tree:
       {
   "root": {
@@ -303,7 +305,7 @@ export default {
       const blob = new Blob([textToSave], { type: "text/json" });
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
-      link.download = "schema.json"
+      link.download = this.saveFileName
       link.href = url;
       document.body.appendChild(link);
       link.click();
