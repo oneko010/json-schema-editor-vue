@@ -20,7 +20,7 @@
       </div>
     </div>
     <a-modal v-model="conditionModifyVisible" v-if="conditionModifyVisible" width="800px" height="600px" @ok="submitCondition" v-bind:title="conditionTitle">
-      <ConditionPropertyEditor v-if="isModifyProperty" :index="propertyIndex" />
+      <ConditionPropertyEditor ref="conditionPropertyEditor" v-if="isModifyProperty" :value="tree" :index="propertyIndex" />
       <ConditionEditor ref="conditionEditor" :value="tree" :index="conditionIndex" v-else />
     </a-modal>
     <a-modal v-model="visible" title="import json" width="800px" height="600x" @ok="handleImportJson">
@@ -85,7 +85,11 @@ export default {
       this.visible = false
     },
     submitCondition() {
-      this.$refs.conditionEditor.submit()
+      if (this.isModifyProperty) {
+        this.$refs.conditionPropertyEditor.submit()
+      } else {
+        this.$refs.conditionEditor.submit()
+      }
       this.conditionModifyVisible = false
     },
     modifyCondition(index, isModifyProperty) {
