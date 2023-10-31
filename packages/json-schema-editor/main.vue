@@ -315,6 +315,9 @@ export default {
           this.advancedValue.enum = arr.map(item => +item);
         }
       }
+      if (this.advancedValue.enum.length > 1) {
+        this.advancedValue.enum = [...new Set(this.advancedValue.enum)]
+      }
     },
     _deepCheck(checked,node){
       if(node.type === 'object' && node.properties){

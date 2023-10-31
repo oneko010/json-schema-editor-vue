@@ -192,7 +192,9 @@ export default {
                     this.advancedValue.enum = arr.map(item => +item);
                 }
             }
-            console.log("enum: "+ JSON.stringify(this.advancedValue))
+            if (this.advancedValue.enum.length > 1) {
+                this.advancedValue.enum = [...new Set(this.advancedValue.enum)]
+            }
         },
         _pickDiffKey () {
             const keys = Object.keys(this.value)
