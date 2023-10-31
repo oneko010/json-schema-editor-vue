@@ -4,7 +4,8 @@
         <span>条件编辑</span><a-button class="button" @click="onCreateRequire">新增require条件</a-button><a-button class="button" @click="onCreateProperty">新增property条件</a-button>
         <a-row :gutter="6" v-for="(item, index) in conditions" :key="index" class="row">
             <a-col :span="18">
-                <a-input :value="getCondition(index)" :disabled="disabled"></a-input>
+                <span style="margin-right: 10px;">{{ getThenNode(index).properties ? "组合属性" : "必选属性" }}</span>
+                <a-input :value="getCondition(index)" :disabled="disabled" style="width:85%"></a-input>
             </a-col>
             <a-col>
                 <a-tooltip class="button">
@@ -79,8 +80,14 @@ export default {
         onCreateProperty() {
             this.modifyCondition(-1, true)
         },
+        getThenNode(index) {
+            const thennode = this.conditions[index].then
+            console.log("then " + JSON.stringify(thennode))
+            return thennode
+        },
         onSetting(index) {
-            this.modifyCondition(index, false)
+            let isModifyProperty = this.getThenNode(index).properties != undefined
+            this.modifyCondition(index, isModifyProperty)
         },
         removeNode(index) {
             console.log("removeNode" + index)
@@ -95,7 +102,7 @@ export default {
 </script>
 <style>
 .row {
-    margin-bottom: 10px;
+    margin-top: 10px;
 }
 .button{
     margin-left: 10px;

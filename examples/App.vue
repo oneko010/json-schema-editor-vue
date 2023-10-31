@@ -95,6 +95,7 @@ export default {
     modifyCondition(index, isModifyProperty) {
       this.isModifyProperty = isModifyProperty
       this.conditionIndex = index
+      this.propertyIndex = index
       this.conditionModifyVisible = true
     },
     getFile(event) {
