@@ -1,7 +1,7 @@
 <template>
     <div>
         <!-- <p v-for="(item, index) in conditions" :key="index" >{{ getCondition(index) }}</p> -->
-        <span>条件编辑</span><a-button class="button" @click="onCreateRequire">新增require条件</a-button><a-button class="button" @click="onCreateProperty">新增property条件</a-button>
+        <span>条件编辑</span><a-button class="button" @click="onCreateRequire">新增必选属性</a-button><a-button class="button" @click="onCreateProperty">新增组合属性</a-button>
         <a-row :gutter="6" v-for="(item, index) in conditions" :key="index" class="row">
             <a-col :span="18">
                 <span style="margin-right: 10px;">{{ getThenNode(index).properties ? "组合属性" : "必选属性" }}</span>
