@@ -5,7 +5,7 @@
         <a-row :gutter="6" v-for="(item, index) in conditions" :key="index" class="row">
             <a-col :span="18">
                 <span style="margin-right: 10px;">{{ getThenNode(index).properties ? "组合属性" : "必选属性" }}</span>
-                <a-input :value="getCondition(index)" :disabled="disabled" style="width:85%"></a-input>
+                <a-input :value="getCondition(index)" :disabled="disabled" style="width:80%"></a-input>
             </a-col>
             <a-col>
                 <a-tooltip class="button">

@@ -29,8 +29,8 @@ export default {
                     }
                 }, 
                 "then": {
+                    "type": "object",
                     "properties": {
-                        "type": "object"
                     }
                 }
             }
@@ -77,7 +77,7 @@ export default {
             let index = this.index < 0 ? node.allOf.length - 1 : this.index
             const thennode = node.allOf[index].then
             return {
-                "root": thennode.properties
+                "root": thennode
             }
         },
         ownProps () {
