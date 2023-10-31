@@ -20,7 +20,8 @@
       </div>
     </div>
     <a-modal v-model="conditionModifyVisible" v-if="conditionModifyVisible" width="800px" height="600px" @ok="submitCondition" title="Modify Condition Required">
-        <ConditionEditor ref="conditionEditor" :value="tree" :index="conditionIndex" />
+      <ConditionPropertyEditor v-if="isModifyProperty" :index="propertyIndex" />
+      <ConditionEditor ref="conditionEditor" :value="tree" :index="conditionIndex" v-else />
     </a-modal>
     <a-modal v-model="visible" title="import json" width="800px" height="600x" @ok="handleImportJson">
       <div class="code-container">
@@ -35,10 +36,11 @@ var app = require("../package.json");
 import Codemirror  from './components/Codemirror.vue'
 import GenerateSchema from 'generate-schema'
 import ConditionEditor from './components/ConditionEditor.vue'
+import ConditionPropertyEditor from './components/ConditionPropertyEditor.vue'
 import ConditionList from './components/ConditionList.vue'
 export default {
   name: 'App',
-  components: { Codemirror, ConditionEditor, ConditionList },
+  components: { Codemirror, ConditionEditor, ConditionList, ConditionPropertyEditor },
   computed: {
     jsonStr: {
       get: function () {
@@ -55,8 +57,11 @@ export default {
       importJson: '',
       visible: false,
       conditionModifyVisible: false,
-      conditions:[],
       conditionIndex: -1,
+      conditions:[],
+      propertyIndex: -1,
+      properties:[],
+      isModifyProperty: true,
       saveFileName: "schema.json",
       tree:
       {
@@ -80,7 +85,8 @@ export default {
       this.$refs.conditionEditor.submit()
       this.conditionModifyVisible = false
     },
-    modifyCondition(index) {
+    modifyCondition(index, isModifyProperty) {
+      this.isModifyProperty = isModifyProperty
       this.conditionIndex = index
       this.conditionModifyVisible = true
     },

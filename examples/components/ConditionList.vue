@@ -1,7 +1,7 @@
 <template>
     <div>
         <!-- <p v-for="(item, index) in conditions" :key="index" >{{ getCondition(index) }}</p> -->
-        <span>条件编辑</span><a-button class="button" @click="onCreate">新增条件</a-button>
+        <span>条件编辑</span><a-button class="button" @click="onCreateRequire">新增require条件</a-button><a-button class="button" @click="onCreateProperty">新增property条件</a-button>
         <a-row :gutter="6" v-for="(item, index) in conditions" :key="index" class="row">
             <a-col :span="18">
                 <a-input :value="getCondition(index)" :disabled="disabled"></a-input>
@@ -47,6 +47,7 @@ export default {
         modifyCondition: {
             type: Function,
             required: true
+            // (index, isModifyProperty)
         }
     },
     data() {
@@ -72,12 +73,14 @@ export default {
             })
             return arr.join(",")
         },
-        onCreate() {
-            this.modifyCondition(-1)
+        onCreateRequire() {
+            this.modifyCondition(-1, false)
+        },
+        onCreateProperty() {
+            this.modifyCondition(-1, true)
         },
         onSetting(index) {
-            console.log("onsetting" + index)
-            this.modifyCondition(index)
+            this.modifyCondition(index, false)
         },
         removeNode(index) {
             console.log("removeNode" + index)
