@@ -19,7 +19,7 @@
         <ConditionList class="condition" :value="tree" :modify-condition="modifyCondition" />
       </div>
     </div>
-    <a-modal v-model="conditionModifyVisible" v-if="conditionModifyVisible" width="800px" height="600px" @ok="submitCondition" title="Modify Condition Required">
+    <a-modal v-model="conditionModifyVisible" v-if="conditionModifyVisible" width="800px" height="600px" @ok="submitCondition" v-bind:title="conditionTitle">
       <ConditionPropertyEditor v-if="isModifyProperty" :index="propertyIndex" />
       <ConditionEditor ref="conditionEditor" :value="tree" :index="conditionIndex" v-else />
     </a-modal>
@@ -49,6 +49,9 @@ export default {
       set: function (newVal) {
         this.tree = JSON.parse(newVal)
       }
+    },
+    conditionTitle() {
+      return this.isModifyProperty ? "编辑组合属性" : "编辑必选属性";
     }
   },
   data() {
