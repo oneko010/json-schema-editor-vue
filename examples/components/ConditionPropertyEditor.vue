@@ -86,9 +86,20 @@ export default {
             return [ 'type', 'title', 'properties', 'items','required', ...Object.keys(this.advancedAttr)]
         },
         allPropertyList() {
+            // 外层属性
             const node = this.pickValue
             node.properties || this.$set(node, 'properties', {})
-            return Object.keys(node.properties)
+
+            // 条件属性
+            node.allOf || this.$set(node, 'allOf', [])
+
+            let index = this.index < 0 ? node.allOf.length - 1 : this.index
+            const thennode = node.allOf[index].then
+            if (thennode.properties == undefined) {
+                this.$set(thennode, 'properties', {'type': 'object'})
+            }
+
+            return [...Object.keys(node.properties), ...Object.keys(thennode.properties)]
         },
         requiredList() {
             const node = this.pickValue

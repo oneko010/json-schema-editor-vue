@@ -4,7 +4,7 @@
         <span>条件编辑</span><a-button class="button" @click="onCreateCondition">新增条件</a-button>
         <a-row :gutter="6" v-for="(item, index) in conditions" :key="index" class="row">
             <a-col :span="18">
-                <a-input :value="getCondition(index)" :disabled="disabled" style="width:80%"></a-input>
+                <a-input :value="getCondition(index)" :disabled="disabled"></a-input>
             </a-col>
             <a-col>
                 <a-tooltip class="button">
