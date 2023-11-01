@@ -1,10 +1,9 @@
 <template>
     <div>
         <!-- <p v-for="(item, index) in conditions" :key="index" >{{ getCondition(index) }}</p> -->
-        <span>条件编辑</span><a-button class="button" @click="onCreateRequire">新增必选属性</a-button><a-button class="button" @click="onCreateProperty">新增组合属性</a-button>
+        <span>条件编辑</span><a-button class="button" @click="onCreateCondition">新增条件</a-button>
         <a-row :gutter="6" v-for="(item, index) in conditions" :key="index" class="row">
             <a-col :span="18">
-                <span style="margin-right: 10px;">{{ getThenNode(index).properties ? "组合属性" : "必选属性" }}</span>
                 <a-input :value="getCondition(index)" :disabled="disabled" style="width:80%"></a-input>
             </a-col>
             <a-col>
@@ -48,7 +47,6 @@ export default {
         modifyCondition: {
             type: Function,
             required: true
-            // (index, isModifyProperty)
         }
     },
     data() {
@@ -74,11 +72,8 @@ export default {
             })
             return arr.join(",")
         },
-        onCreateRequire() {
-            this.modifyCondition(-1, false)
-        },
-        onCreateProperty() {
-            this.modifyCondition(-1, true)
+        onCreateCondition() {
+            this.modifyCondition(-1)
         },
         getThenNode(index) {
             const thennode = this.conditions[index].then
@@ -86,8 +81,7 @@ export default {
             return thennode
         },
         onSetting(index) {
-            let isModifyProperty = this.getThenNode(index).properties != undefined
-            this.modifyCondition(index, isModifyProperty)
+            this.modifyCondition(index)
         },
         removeNode(index) {
             console.log("removeNode" + index)

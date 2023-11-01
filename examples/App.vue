@@ -20,8 +20,7 @@
       </div>
     </div>
     <a-modal v-model="conditionModifyVisible" v-if="conditionModifyVisible" width="800px" height="600px" @ok="submitCondition" v-bind:title="conditionTitle">
-      <ConditionPropertyEditor ref="conditionPropertyEditor" v-if="isModifyProperty" :value="tree" :index="propertyIndex" />
-      <ConditionEditor ref="conditionEditor" :value="tree" :index="conditionIndex" v-else />
+      <ConditionPropertyEditor ref="conditionPropertyEditor" :value="tree" :index="conditionIndex" />
     </a-modal>
     <a-modal v-model="visible" title="import json" width="800px" height="600x" @ok="handleImportJson">
       <div class="code-container">
@@ -35,12 +34,11 @@
 var app = require("../package.json");
 import Codemirror  from './components/Codemirror.vue'
 import GenerateSchema from 'generate-schema'
-import ConditionEditor from './components/ConditionEditor.vue'
 import ConditionPropertyEditor from './components/ConditionPropertyEditor.vue'
 import ConditionList from './components/ConditionList.vue'
 export default {
   name: 'App',
-  components: { Codemirror, ConditionEditor, ConditionList, ConditionPropertyEditor },
+  components: { Codemirror, ConditionList, ConditionPropertyEditor },
   computed: {
     jsonStr: {
       get: function () {
@@ -51,7 +49,7 @@ export default {
       }
     },
     conditionTitle() {
-      return this.isModifyProperty ? "编辑组合属性" : "编辑必选属性";
+      return "编辑条件";
     }
   },
   data() {
@@ -62,9 +60,6 @@ export default {
       conditionModifyVisible: false,
       conditionIndex: -1,
       conditions:[],
-      propertyIndex: -1,
-      properties:[],
-      isModifyProperty: true,
       saveFileName: "schema.json",
       tree:
       {
@@ -85,17 +80,11 @@ export default {
       this.visible = false
     },
     submitCondition() {
-      if (this.isModifyProperty) {
-        this.$refs.conditionPropertyEditor.submit()
-      } else {
-        this.$refs.conditionEditor.submit()
-      }
+      this.$refs.conditionPropertyEditor.submit()
       this.conditionModifyVisible = false
     },
-    modifyCondition(index, isModifyProperty) {
-      this.isModifyProperty = isModifyProperty
+    modifyCondition(index) {
       this.conditionIndex = index
-      this.propertyIndex = index
       this.conditionModifyVisible = true
     },
     getFile(event) {

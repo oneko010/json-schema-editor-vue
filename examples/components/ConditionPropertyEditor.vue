@@ -1,13 +1,14 @@
 <script>
 import Vue from 'vue'
-import { Modal } from 'ant-design-vue'
+import { Modal, Checkbox } from 'ant-design-vue'
 import PropertyEditor from '../../packages/json-schema-editor/PropertyEditor.vue'
 import { isNull } from '../../packages/json-schema-editor/util'
 Modal.install(Vue)
 export default {
     components: { 
         PropertyEditor, 
-        AModal: Modal 
+        AModal: Modal,
+        ACheckbox: Checkbox
     },
     data() {
         return {
@@ -31,7 +32,8 @@ export default {
                 "then": {
                     "type": "object",
                     "properties": {
-                    }
+                    },
+                    "required":[]
                 }
             }
             node.allOf.push(conditionObject)
@@ -70,7 +72,7 @@ export default {
                 return conditionNode
             }
         },
-        propertyObject() {
+        thenNode() {
             const node = this.pickValue
             node.allOf || this.$set(node, 'allOf', [])
 
@@ -82,6 +84,22 @@ export default {
         },
         ownProps () {
             return [ 'type', 'title', 'properties', 'items','required', ...Object.keys(this.advancedAttr)]
+        },
+        allPropertyList() {
+            const node = this.pickValue
+            node.properties || this.$set(node, 'properties', {})
+            return Object.keys(node.properties)
+        },
+        requiredList() {
+            const node = this.pickValue
+            node.allOf || this.$set(node, 'allOf', [])
+
+            let index = this.index < 0 ? node.allOf.length - 1 : this.index
+            const thennode = node.allOf[index].then
+            if (thennode.required == undefined) {
+                this.$set(thennode, 'required', [])
+            }
+            return thennode.required
         }
     },
     methods: {
@@ -90,8 +108,20 @@ export default {
             node.allOf || this.$set(node, 'allOf', [])
 
             let index = this.index < 0 ? node.allOf.length - 1 : this.index
+            const thennode = node.allOf[index].then
+            let hasRequired = true
+            let hasProperties = true
+            if (thennode.required.length == 0) {
+                this.$delete(thennode, 'required')
+                hasRequired = false
+            }
+            if (Object.keys(thennode.properties).length == 0) {
+                this.$delete(thennode, 'properties')
+                hasProperties = false
+            }
             const ifnode = node.allOf[index].if
-            if (Object.keys(ifnode.properties).length == 0) {
+            const isValid = Object.keys(ifnode.properties).length > 0 && (hasRequired || hasProperties)
+            if (!isValid) {
                 node.allOf.splice(this.index, 1)
             }
             if (node.allOf.length == 0) {
@@ -109,6 +139,23 @@ export default {
                 thennode.required.splice(index, 1)
             } else {
                 thennode.required.push(property)
+            }
+        },
+        selectedAllChanged() {
+            const node = this.pickValue
+            node.allOf || this.$set(node, 'allOf', [])
+
+            let index = this.index < 0 ? node.allOf.length - 1 : this.index
+            const thennode = node.allOf[index].then
+            const selectedAll = this.requiredList.length != this.allPropertyList.length
+            if (selectedAll) {
+                this.allPropertyList.forEach(element => {
+                    if (!thennode.required.includes(element)) {
+                        thennode.required.push(element)
+                    }
+                })
+            } else {
+                thennode.required.splice(0, thennode.required.length)
             }
         },
         modifyProperty(property) {
@@ -155,7 +202,9 @@ export default {
     <div>
         <p>{{ condition }}</p>
         <json-schema-editor class="schema" :value="condition" :onSettingCallback="modifyProperty" disabledType lang="zh_CN" custom/>
-        <json-schema-editor class="schema" :value="propertyObject" :onSettingCallback="modifyProperty" disabledType lang="zh_CN" custom/>
+        <json-schema-editor class="schema" :value="thenNode" :onSettingCallback="modifyProperty" disabledType lang="zh_CN" custom/>
+        <a-checkbox v-for="item in allPropertyList" :key="item" :checked="requiredList.includes(item)" class="ant-col-name-required" @change="propertySelectChanged(item)">{{ item }}</a-checkbox>
+        <a-checkbox @change="selectedAllChanged" :checked="requiredList.length == allPropertyList.length">全选</a-checkbox>
         <a-modal v-model="visible" v-if="visible"  width="800px" height="600px" @ok="submitProperty" title="Modify Condition Required">
             <PropertyEditor :value="advancedValue" :custom="custom" ref="propertyEditor" />
         </a-modal>
