@@ -1,6 +1,5 @@
 <template>
     <div>
-        <!-- <p v-for="(item, index) in conditions" :key="index" >{{ getCondition(index) }}</p> -->
         <span>条件编辑</span><a-button class="button" @click="onCreateCondition">新增条件</a-button>
         <a-row :gutter="6" v-for="(item, index) in conditions" :key="index" class="row">
             <a-col :span="18">

@@ -130,8 +130,16 @@ export default {
                 this.$delete(thennode, 'properties')
                 hasProperties = false
             }
-            const ifnode = node.allOf[index].if
-            const isValid = Object.keys(ifnode.properties).length > 0 && (hasRequired || hasProperties)
+
+            // condition中的property都转换为required，防止property不存在错误的使用if
+            let ifnode = node.allOf[index].if
+            let requiredList = []
+            if (ifnode.properties != undefined) {
+                requiredList = [...Object.keys(ifnode.properties)]
+                this.$set(ifnode, 'required', requiredList)
+            }
+
+            const isValid = requiredList.length > 0 && (hasRequired || hasProperties)
             if (!isValid) {
                 node.allOf.splice(this.index, 1)
             }
@@ -173,7 +181,7 @@ export default {
             this.advancedValue = property
             this.visible = true
         },
-        submitProperty() {
+        submitCondition() {
             this.visible = false
             const finalProperty = this.$refs.propertyEditor.getFinalProperty()
 
@@ -216,7 +224,7 @@ export default {
         <json-schema-editor class="schema" :value="thenNode" :onSettingCallback="modifyProperty" disabledType lang="zh_CN" custom/>
         <a-checkbox v-for="item in allPropertyList" :key="item" :checked="requiredList.includes(item)" class="ant-col-name-required" @change="propertySelectChanged(item)">{{ item }}</a-checkbox>
         <a-checkbox @change="selectedAllChanged" :checked="requiredList.length == allPropertyList.length">全选</a-checkbox>
-        <a-modal v-model="visible" v-if="visible"  width="800px" height="600px" @ok="submitProperty" title="Modify Condition Required">
+        <a-modal v-model="visible" v-if="visible"  width="800px" height="600px" @ok="submitCondition" title="Modify Condition Required">
             <PropertyEditor :value="advancedValue" :custom="custom" ref="propertyEditor" />
         </a-modal>
     </div>
